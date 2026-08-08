@@ -38,12 +38,16 @@ def analyze_review(title, category, rating, emoji, review):
 이모지: {emoji_meaning.get(emoji, "알 수 없음")}
 후기: {review}
 """
-    response = client.models.generate_content(
-        model="gemini-3-flash-preview",
-        contents=system_prompt + "\n" + user_input,
-        config={"response_mime_type": "application/json"}
-    )
     try:
-        return json.loads(response.text)
-    except json.JSONDecodeError:
-        return {"emotion_score": "", "emotion_category": "", "keywords": "", "summary": "", "highlight_type": ""}
+        response = client.models.generate_content( # API 호출
+            model="gemini-3-flash-preview",
+            contents=system_prompt + "\n" + user_input,
+            config={"response_mime_type": "application/json"}
+        )
+        return json.loads(response.text) # 파싱
+    except json.JSONDecodeError: # 파싱 실패 시
+        print("JSON 파싱 실패")
+        return {"emotion_score": "", "emotion_category": "", "keywords": [], "summary": "", "highlight_type": ""}
+    except Exception as e: # API 호출 실패 시
+        print(f"API 호출 실패: {e}")
+        return {"emotion_score": "", "emotion_category": "", "keywords": [], "summary": "", "highlight_type": ""}
