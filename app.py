@@ -83,7 +83,7 @@ if submit:
             today_str = str(date.today())
             keywords_display = ", ".join(ai_result["keywords"]) 
 
-            st.markdown(f"### {title} {emoji}")
+            st.markdown(f"### {title}&nbsp;&nbsp;{emoji}")
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown(f"**아이디**: {user_id}")
@@ -97,7 +97,9 @@ if submit:
             > {review}
             
             ---
-            **AI 분석**
+            """)
+            st.markdown("### AI 분석")
+            st.markdown(f"""
             - **감정 점수**: {ai_result['emotion_score']}/5
             - **감정 카테고리**: {ai_result['emotion_category']}
             - **만족 포인트**: {ai_result['highlight_type']}
