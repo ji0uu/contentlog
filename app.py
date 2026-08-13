@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from datetime import date
+from datetime import datetime
 import os
 from prompt import analyze_review
 
@@ -28,7 +28,7 @@ st.markdown(
 )
 
 CATEGORY_OPTIONS = ["영화", "드라마", "책", "공연", "전시","기타"]
-EMOJI_OPTIONS = ["😍(설렘)", "🥹(감동)", "😢(슬픔)", "😑(지루함)", "😌(힐링)", "😐(그럭저럭)", "🤩(몰입/흥미진진)"]
+EMOJI_OPTIONS = ["😍(재밌음)", "🥹(감동)", "😢(슬픔)", "😑(지루함)", "😌(힐링)", "😐(그럭저럭)", "🤩(몰입/흥미진진)"]
 
 user_id = st.text_input("아이디")
 title = st.text_input("콘텐츠 제목")
@@ -47,13 +47,13 @@ def save_entry(user_id, title, category, rating, emoji, review, ai_result):
 
     new_row = {
         "id": user_id,
-        "date": str(date.today()),
+        "date": str(datetime.now().strftime("%Y-%m-%d %H:%M")),
         "title": title,
         "category": category,
         "rating": rating,
         "emoji": emoji,
         "review": review,
-        "emotion_score": ai_result["emotion_score"],       # AI 분석 결과는 아직 비워둠 
+        "emotion_score": ai_result["emotion_score"],       
         "emotion_category": ai_result["emotion_category"],
         "keywords": keywords_str,
         "summary": ai_result["summary"],
@@ -80,10 +80,18 @@ if submit:
             st.success("저장되었습니다! ✅")
             
             star_display = "⭐" * rating
-            today_str = str(date.today())
+            today_str = str(datetime.now().strftime("%Y-%m-%d %H:%M"))
             keywords_display = ", ".join(ai_result["keywords"]) 
 
-            st.markdown(f"### {title}&nbsp;&nbsp;{emoji}")
+            st.markdown(
+                f"""
+                <div style="display: flex; align-items: baseline; gap: 8px;">
+                    <span style="font-size: 24px; font-weight: 700;">{title}</span>
+                    <span style="font-size: 20px;">{emoji}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown(f"**아이디**: {user_id}")
@@ -107,5 +115,5 @@ if submit:
             - **요약**: {ai_result['summary']}
             """)
     else:
-        st.warning("제목과 후기는 꼭 입력해주세요!")
+        st.warning("아이디와 제목과 후기는 꼭 입력해주세요!")
         
