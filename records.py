@@ -10,9 +10,21 @@ def show_all_records(df, user_id):
         return
 
     for _, row in my_df.iterrows():
-        with st.expander(f"{row['title']} {row['emoji']} {row['date']}"):
-            st.write(f"별점 | {row['rating']}/5")
-            st.write(f"후기 | {row['review']}")
-            st.write(f"한줄 요약 | {row['summary']}")
+        with st.expander(f"{row['title']} ({row['category']}) {row['emoji']} {row['date']}"):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write(f"**별점** | {row['rating']}/5")
+            with col2:
+                st.write(f"**감정** | {row['emotion_category']}")
 
+            st.write(f"**후기** | {row['review']}")
 
+            keywords_list = row['keywords']
+            hashtags = ' '.join([f"#{keyword}" for keyword in keywords_list])
+
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write(f"**만족 포인트** | {row['highlight_type']}")
+            with col2:
+                st.write(f"**키워드** | {hashtags}")
+            st.write(f"**한줄 요약** | {row['summary']}")
