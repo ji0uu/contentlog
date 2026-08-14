@@ -1,7 +1,10 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
 from datetime import datetime
+from collections import Counter
 
 # 기본 통계형
 def show_basic_stats(df):
@@ -221,3 +224,45 @@ def show_weekday_time_heatmap(df):
     )
     fig.update_layout(height=400)
     st.plotly_chart(fig, use_container_width=True)
+
+# 워드클라우드
+def show_wordcloud(df):
+    if len(df) == 0:
+        st.info("아직 기록이 없어요")
+        return
+
+    all_keywords = df['keywords'].dropna().tolist()
+    text = ' '.join(all_keywords).replace(',', ' ')
+
+    if not text.strip():
+        st.info("아직 키워드가 없어요")
+        return
+
+    wc = WordCloud(
+        font_path = "malgun.ttf",  # 한글 폰트 경로 설정 필요
+        background_color='white',
+        width=600,
+        height=300
+    ).generate(text)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.imshow(wc, interpolation='bilinear')
+    ax.axis('off')
+    return fig
+
+# 가장 많이 언급된 키워드 랭킹
+def show_top_keywords(df):
+    if len(df) == 0:
+        return None
+
+    all_keywords = df["keywords"].dropna().tolist()
+    keyword_list = []
+    for k in all_keywords:
+        keyword_list.extend([kw.strip() for kw in k.split(",")])
+
+    if not keyword_list:
+        return None
+
+    top5 = Counter(keyword_list).most_common(5)
+    return top5
+
