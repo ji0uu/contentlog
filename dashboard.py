@@ -4,7 +4,8 @@ from charts import (
     show_basic_stats, show_category_satisfaction, 
     show_emotion_pie, show_emotion_trend, show_highlight_type, 
     show_weekday_pattern, show_time_pattern, show_weekday_time_heatmap, 
-    show_wordcloud, show_top_keywords)
+    show_wordcloud, show_top_keywords, show_top3_favorites,
+    show_category_radar, show_length_rating, show_time_satisfaction)
 
 st.title("나의 콘텐츠 감상 기록 대시보드")
 
@@ -44,3 +45,13 @@ with col2:
             st.write(f"{i}. {keyword} ({count}회)")
     else:
         st.info("아직 키워드가 없어요")
+
+show_top3_favorites(df)
+show_category_radar(df)
+
+st.subheader("상관관계 분석")
+col1, col2 = st.columns(2)
+with col1:
+    show_length_rating(df)
+with col2:
+    show_time_satisfaction(df)

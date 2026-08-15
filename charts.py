@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 from wordcloud import WordCloud
 from datetime import datetime
 from collections import Counter
@@ -266,3 +267,103 @@ def show_top_keywords(df):
     top5 = Counter(keyword_list).most_common(5)
     return top5
 
+# 인생작 top3
+def show_top3_favorites(df):
+    st.subheader("나의 인생작 Top3")
+
+    if len(df) == 0:
+        st.info("아직 기록이 없어요")
+        return
+
+    top3 = df.sort_values("rating", ascending=False).head(3).reset_index(drop=True)
+
+    medals = ["🥇", "🥈", "🥉"]
+    
+    cols = st.columns(3)
+    for i, row in top3.iterrows():
+        with cols[i]:
+            st.markdown(f"<h2 style='text-align: center;'>{medals[i]}</h2>", unsafe_allow_html=True)
+            st.markdown(f"<h4 style='text-align: center;'>{row['title']}</h4>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>{row['category']} · {'⭐' * int(row['rating'])}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; color: #888;'>{row['summary']}</p>", unsafe_allow_html=True)
+
+# 카테고리 간 만족 포인트 비교
+
+def show_category_radar(df):
+    st.subheader("카테고리별 만족 포인트 비교")
+
+    if len(df) == 0:
+        st.info("아직 기록이 없어요")
+        return
+
+    # 카테고리 x highlight_type 교차 집계
+    cross = df.groupby(["category", "highlight_type"]).size().reset_index(name="count")
+
+    # 가장 많이 본 카테고리 순으로 상위 2~3개
+    top_categories = df["category"].value_counts().index.tolist()
+    default_categories = top_categories[:3] # 상위 3개 기본값 자동 설정
+
+    selected = st.multiselect(
+        "비교할 카테고리 선택",
+        options=top_categories, # 선택 가능한 전체 목록
+        default=default_categories # 기본값
+    )
+
+    if not selected:
+        st.info("카테고리를 하나 이상 선택해주세요")
+        return
+
+    fig = go.Figure()
+    for cat in selected:
+        cat_data = cross[cross['category'] == cat]
+        fig.add_trace(go.Scatterpolar(
+            r=cat_data['count'],
+            theta=cat_data['highlight_type'],
+            fill='toself',
+            name=cat
+        ))
+
+    fig.update_layout(height=400, showlegend=True)
+    st.plotly_chart(fig, use_container_width=True)
+
+# 상관관계
+# 후기 글자수 - 별점
+def show_length_rating(df):
+    st.subheader("후기 글자수와 별점의 관계")
+
+    if len(df) == 0:
+        st.info("아직 기록이 없어요")
+        return
+
+    df['review_length'] = df['review'].str.len()
+
+    fig = px.scatter(
+        df,
+        x='review_length',
+        y='rating',
+        labels={'review_length': '후기 글자수',
+                'rating': '별점'},
+        hover_data=['title'] #마우스 올리면 제목도 보이게
+    )
+    fig.update_layout(height=350, yaxis_range=[0,5.5])
+    st.plotly_chart(fig, use_container_width=True)
+
+def show_time_satisfaction(df):
+    st.subheader("시간대별 평균 만족도")
+
+    if len(df) == 0:
+        st.info("아직 기록이 없어요")
+        return
+
+    df['date'] = pd.to_datetime(df['date'])
+    df['hour'] = df['date'].dt.hour
+    df['time_period'] = df['hour'].apply(lambda h: "새벽" if h < 6 
+                                         else "아침" if h < 12 
+                                         else "오후" if h < 18 else "저녁")
+    period_order = ['새벽', '아침', '오후', '저녁']
+
+    time_avg = df.groupby('time_period')['rating'].mean().reindex(period_order).reset_index()
+
+    fig = px.bar(time_avg, x="time_period", y="rating", text_auto=".1f")
+    fig.update_layout(height=350, yaxis_range=[0, 5])
+    st.plotly_chart(fig, use_container_width=True)
