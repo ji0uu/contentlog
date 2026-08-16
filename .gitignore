@@ -220,4 +220,3 @@ __marimo__/
 .env
 .vscode/
 __pycache__/
-content_data.csv
