@@ -10,7 +10,7 @@ def show_all_records(df, user_id):
         return
 
     for _, row in my_df.iterrows():
-        with st.expander(f"**{row['title']}** ({row['category']}) {row['emoji']} {row['date']}"):
+        with st.expander(f"**{row['title']}** | ({row['category']}) | {row['emoji']} | {row['date']}"):
             col1, col2 = st.columns(2)
             with col1:
                 star_display = "⭐" * int(row['rating'])
