@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 from charts import (
-    show_basic_stats, show_category_satisfaction, 
-    show_emotion_pie, show_emotion_trend, show_highlight_type, 
+    show_total_count, show_basic_stats, show_category_satisfaction, 
+    show_emotion_pie, show_emotion_rating, show_highlight_type, 
     show_weekday_pattern, show_time_pattern, show_weekday_time_heatmap, 
     show_wordcloud, show_top_keywords, show_top3_favorites,
     show_category_radar, show_length_rating, show_time_satisfaction)
@@ -11,12 +11,14 @@ st.title("나의 콘텐츠 감상 기록 대시보드")
 
 # 더미 데이터 불러오기
 df = pd.read_csv("dummy_content_data.csv")
+# 연결 이후에는 content_data.csv로 수정
 
 show_basic_stats(df)
 show_category_satisfaction(df)
 show_emotion_pie(df)
 show_highlight_type(df)
-show_emotion_trend(df)
+show_total_count(df)
+show_emotion_rating(df)
 
 # 요일별/시간대별 나란히 배치
 st.subheader("요일별/시간대별 감상 기록")

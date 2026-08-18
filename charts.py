@@ -123,9 +123,29 @@ def show_highlight_type(df):
 
     st.plotly_chart(fig, use_container_width=True)
 
-# 감정 점수 추이
-def show_emotion_trend(df):
-    st.subheader("감정 점수 추이")
+# 누적 감상 개수 추이
+def show_total_count(df):
+    st.subheader("누적 감상 개수")
+
+    if len(df) == 0:
+        st.info("아직 기록이 없어요")
+        return
+
+    df['date'] = pd.to_datetime(df['date'])
+    df_sorted = df.sort_values('date').reset_index(drop=True)
+    df_sorted['total_count'] = range(1, len(df_sorted)+1)
+
+    fig = px.line(
+        df_sorted, x='date', y='total_count',
+        labels={'date': '날짜', 'total_count': '누적 개수'}, 
+        markers=True
+    )
+    fig.update_layout(height=350)
+    st.plotly_chart(fig, use_container_width=True)
+
+# 감정 점수 vs 별점 
+def show_emotion_rating(df):
+    st.subheader("별점 vs AI 감정 점수 비교")
 
     if len(df) == 0:
         st.info("아직 기록이 없어요")
@@ -134,12 +154,15 @@ def show_emotion_trend(df):
     df['date'] = pd.to_datetime(df['date'])
     df_sorted = df.sort_values(by='date')
 
-    fig = px.line(
-        df_sorted, 
-        x="date", 
-        y="emotion_score",
-        labels={"date": "날짜", "emotion_score": "감정 점수"},
-    )
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=df_sorted['date'], y=df_sorted['rating'],
+        name='내 별점', mode='lines+markers'
+    ))
+    fig.add_trace(go.Scatter(
+        x=df_sorted['date'], y=df_sorted['emotion_score'],
+        name='AI 감정점수', mode='lines+markers'
+    ))
     fig.update_layout(height=350, yaxis_range=[0, 5])
     st.plotly_chart(fig, use_container_width=True)
 
