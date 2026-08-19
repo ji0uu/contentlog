@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 from prompt import analyze_review
 from records import show_all_records
+from dashboard import show_dashboard
 
 tab1, tab2, tab3 = st.tabs(['메인','기록 보기','대시보드'])
 
@@ -126,4 +127,11 @@ with tab2:
     if user_id:
         show_all_records(df, user_id)
     else:
-        st.info("먼저 '메인' 탭에서 아이디를 입력해주세요!")           
+        st.info("먼저 '메인' 탭에서 아이디를 입력해주세요!")    
+
+with tab3:
+    df = pd.read_csv(CSV_FILE)
+    if user_id:
+        show_dashboard(df, user_id)
+    else:
+        st.info("먼저 '메인' 탭에서 아이디를 입력해주세요!")
