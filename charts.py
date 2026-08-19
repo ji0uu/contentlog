@@ -83,7 +83,11 @@ def show_category_satisfaction(df):
     )
     fig.update_traces(width=0.4) # 막대 두께 조정
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 감정 분포
 def show_emotion_pie(df):
@@ -123,7 +127,11 @@ def show_emotion_pie(df):
     )
     fig.update_layout(height=350)
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 만족 포인트 유형 분석
 def show_highlight_type(df):
@@ -148,7 +156,11 @@ def show_highlight_type(df):
     fig.update_layout(height=350)
     fig.update_traces(width=0.4) # 막대 두께 조정
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 누적 감상 개수 추이
 def show_total_count(df):
@@ -169,7 +181,11 @@ def show_total_count(df):
         color_discrete_sequence=["#91BDB8"]
     )
     fig.update_layout(height=350)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 감정 점수 vs 별점 
 def show_emotion_rating(df):
@@ -196,7 +212,11 @@ def show_emotion_rating(df):
         marker=dict(color="#9A96B5")
     ))
     fig.update_layout(height=350, yaxis_range=[0, 5])
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 요일별 감상 패턴
 def show_weekday_pattern(df):
@@ -285,7 +305,11 @@ def show_weekday_time_heatmap(df):
     ]
     )
     fig.update_layout(height=400)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 워드클라우드
 def show_wordcloud(df):
@@ -386,7 +410,11 @@ def show_category_radar(df):
         ))
 
     fig.update_layout(height=400, showlegend=True)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 상관관계
 # 후기 글자수 - 별점
@@ -409,7 +437,11 @@ def show_length_rating(df):
         color_discrete_sequence=["#E3B184"]
     )
     fig.update_layout(height=350, yaxis_range=[0,5.5])
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 def show_time_satisfaction(df):
     st.subheader("시간대별 평균 만족도")
@@ -429,4 +461,8 @@ def show_time_satisfaction(df):
 
     fig = px.bar(time_avg, x="time_period", y="rating", text_auto=".1f", color_discrete_sequence=["#A9C7B0"])
     fig.update_layout(height=350, yaxis_range=[0, 5])
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
