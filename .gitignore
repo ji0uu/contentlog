@@ -220,4 +220,7 @@ __marimo__/
 .env
 .vscode/
 __pycache__/
+<<<<<<< HEAD
 content_data.csv
+=======
+>>>>>>> origin/main
