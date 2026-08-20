@@ -74,11 +74,15 @@ with tab1:
 
 
     if submit:
-        if user_id and title and review:
+        if not user_id.strip() or not title.strip() or not review.strip():
+            st.warning("아이디와 제목과 후기는 꼭 입력해주세요!")
+        elif rating == 0:
+            st.warning("별점을 선택해주세요!")
+        else:
             with st.spinner("AI가 후기를 분석하고 있어요..."):
                 ai_result = analyze_review(title, category, rating, emoji, review)
             
-            if ai_result["emotion_score"] == "":
+            if not ai_result or ai_result.get("emotion_score", "") == "":
                 st.error("분석에 실패했어요, 다시 시도해주세요")
             else:
                 save_entry(user_id, title, category, rating, emoji, review, ai_result)
@@ -119,8 +123,7 @@ with tab1:
                 - **키워드**: {keywords_display}
                 - **요약**: {ai_result['summary']}
                 """)
-        else:
-            st.warning("아이디와 제목과 후기는 꼭 입력해주세요!")
+     
 
 with tab2:
     df = pd.read_csv(CSV_FILE)
