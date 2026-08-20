@@ -126,6 +126,7 @@ with tab1:
      
 
 with tab2:
+    st.subheader("나의 전체 기록")
     df = pd.read_csv(CSV_FILE)
     if user_id:
         show_all_records(df, user_id)
@@ -133,6 +134,7 @@ with tab2:
         st.info("먼저 '메인' 탭에서 아이디를 입력해주세요!")    
 
 with tab3:
+    st.subheader("나의 콘텐츠 감상 기록 대시보드")
     df = pd.read_csv(CSV_FILE)
     if user_id:
         show_dashboard(df, user_id)

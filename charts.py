@@ -22,7 +22,7 @@ COLOR_PALETTE = [
 # 기본 통계형
 def show_basic_stats(df):
     st.subheader("이번 달 요약")
-    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
     this_month = datetime.now().month
     this_year = datetime.now().year
     this_month_df = df[(df['date'].dt.month == this_month) & (df['date'].dt.year == this_year)]
@@ -170,7 +170,7 @@ def show_total_count(df):
         st.info("아직 기록이 없어요")
         return
 
-    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df_sorted = df.sort_values('date').reset_index(drop=True)
     df_sorted['total_count'] = range(1, len(df_sorted)+1)
 
@@ -195,7 +195,7 @@ def show_emotion_rating(df):
         st.info("아직 기록이 없어요")
         return
 
-    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df_sorted = df.sort_values(by='date')
 
     fig = go.Figure()
@@ -220,7 +220,10 @@ def show_emotion_rating(df):
 
 # 요일별 감상 패턴
 def show_weekday_pattern(df):
-    df['date'] = pd.to_datetime(df['date'])
+    if len(df) == 0:
+        return None
+    
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df['weekday'] = df['date'].dt.day_name()  # 요일 이름 추출
     weekday_map = {
         "Monday": "월", "Tuesday": "화", "Wednesday": "수", "Thursday": "목",
@@ -243,7 +246,10 @@ def show_weekday_pattern(df):
 
 # 시간대별 감상 패턴
 def show_time_pattern(df):
-    df['date'] = pd.to_datetime(df['date'])
+    if len(df) == 0:
+        return None
+    
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df['hour'] = df['date'].dt.hour  # 시간 추출
 
     def get_time_period(hour):
@@ -274,7 +280,7 @@ def show_weekday_time_heatmap(df):
         st.info("아직 기록이 없어요")
         return
 
-    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df['weekday'] = df['date'].dt.day_name().map({
         "Monday": "월", "Tuesday": "화", "Wednesday": "수", "Thursday": "목",
         "Friday": "금", "Saturday": "토", "Sunday": "일"
@@ -324,17 +330,21 @@ def show_wordcloud(df):
         st.info("아직 키워드가 없어요")
         return
 
-    wc = WordCloud(
-        font_path = "malgun.ttf",  # 한글 폰트 경로 설정 필요
-        background_color='white',
-        width=600,
-        height=300
-    ).generate(text)
+    try:
+        wc = WordCloud(
+            font_path="malgun.ttf", # 한글 폰트 경로 설정
+            background_color='white',
+            width=600,
+            height=300
+        ).generate(text)
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.imshow(wc, interpolation='bilinear')
-    ax.axis('off')
-    return fig
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.imshow(wc, interpolation='bilinear')
+        ax.axis('off')
+        return fig
+    except Exception as e: # 폰트 경로 예외 처리
+        st.warning("워드클라우드를 표시할 수 없어요 (폰트 문제)")
+        return None
 
 # 가장 많이 언급된 키워드 랭킹
 def show_top_keywords(df):
@@ -425,7 +435,7 @@ def show_length_rating(df):
         st.info("아직 기록이 없어요")
         return
 
-    df['review_length'] = df['review'].str.len()
+    df['review_length'] = df['review'].fillna('').str.len() # review 컬럼 공백 예외 처리
 
     fig = px.scatter(
         df,
@@ -450,7 +460,7 @@ def show_time_satisfaction(df):
         st.info("아직 기록이 없어요")
         return
 
-    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df['hour'] = df['date'].dt.hour
     df['time_period'] = df['hour'].apply(lambda h: "새벽" if h < 6 
                                          else "아침" if h < 12 

@@ -2,11 +2,10 @@ import streamlit as st
 import pandas as pd
 
 def show_all_records(df, user_id):
-    st.subheader("나의 전체 기록")
     my_df = df[df['id'] == user_id].sort_values(by='date', ascending=False)
 
     if my_df.empty:
-        st.info("아직 기록이 없어요")
+        st.info("아직 기록이 없어요. 첫 콘텐츠를 기록해보세요!")
         return
 
     for _, row in my_df.iterrows():
@@ -20,8 +19,9 @@ def show_all_records(df, user_id):
 
             st.write(f"**후기** | {row['review']}")
 
-            keywords_list = row['keywords'].split(", ")
-            hashtags = ' '.join([f"#{keyword}" for keyword in keywords_list])
+            keywords_str = row['keywords'] if pd.notna(row['keywords']) else "" # keywords 공백 예외 처리 추가
+            keywords_list = keywords_str.split(", ") if keywords_str else []
+            hashtags = ' '.join([f"#{keyword}" for keyword in keywords_list]) if keywords_list else "없음"
 
             col1, col2 = st.columns(2)
             with col1:
