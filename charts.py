@@ -7,6 +7,18 @@ from wordcloud import WordCloud
 from datetime import datetime
 from collections import Counter
 
+
+
+# 여러 색이 필요한 곳(카테고리 비교, 파이차트 등)에 쓸 팔레트
+COLOR_PALETTE = [
+    "#E9A6B2",  # 로즈
+    "#9A96B5",  # 모브
+    "#B8AAD6",  # 라벤더
+    "#91BDB8",  # 세이지 민트
+    "#E3B184",  # 피치
+    "#A9C7B0",  # 세이지
+    "#D8B4A0"
+]
 # 기본 통계형
 def show_basic_stats(df):
     st.subheader("이번 달 요약")
@@ -34,6 +46,16 @@ def show_basic_stats(df):
         st.metric("**이번 달 가장 많이 본 카테고리**", most_watched_category)
 
     st.markdown(f"**이번 달 목표 달성률:** {achieve_rate:.0f}%, ({total_count}/{goal})")
+    st.markdown(
+    """
+    <style>
+    div[data-testid="stProgress"] > div > div > div {
+        background-color: #E9A6B2 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
     st.progress(achieve_rate / 100)
 
 # 카테고리별 만족도
@@ -52,6 +74,8 @@ def show_category_satisfaction(df):
         x="category", 
         y="rating",
         labels={"category": "카테고리", "rating": "평균 별점"},
+        color="category",
+        color_discrete_sequence=COLOR_PALETTE
     )
     fig.update_layout(
         yaxis_range=[0, 5],# 별점이 1~5점이니 y축 고정
@@ -59,7 +83,11 @@ def show_category_satisfaction(df):
     )
     fig.update_traces(width=0.4) # 막대 두께 조정
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 감정 분포
 def show_emotion_pie(df):
@@ -80,7 +108,7 @@ def show_emotion_pie(df):
         "슬픔": "😢",
         "지루함": "😑",
         "그럭저럭": "😐",
-        "몰입/흥미진진": "🤩"
+        "흥미진진": "🤩"
     }
 
     emotion_counts["emoji_label"] = emotion_counts["emotion_category"].map(category_to_emoji)
@@ -89,7 +117,8 @@ def show_emotion_pie(df):
         emotion_counts, 
         names="emoji_label",   # 이모지를 라벨로 사용
         values="count",
-        hole=0.4
+        hole=0.4,
+        color_discrete_sequence=COLOR_PALETTE
     )
     fig.update_traces(
         textposition="inside",
@@ -98,7 +127,11 @@ def show_emotion_pie(df):
     )
     fig.update_layout(height=350)
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 만족 포인트 유형 분석
 def show_highlight_type(df):
@@ -117,11 +150,17 @@ def show_highlight_type(df):
         x="highlight_type", 
         y="count",
         labels={"highlight_type": "만족 포인트", "count": "횟수"},
+        color="highlight_type",
+        color_discrete_sequence=COLOR_PALETTE
     )
     fig.update_layout(height=350)
     fig.update_traces(width=0.4) # 막대 두께 조정
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 누적 감상 개수 추이
 def show_total_count(df):
@@ -138,10 +177,15 @@ def show_total_count(df):
     fig = px.line(
         df_sorted, x='date', y='total_count',
         labels={'date': '날짜', 'total_count': '누적 개수'}, 
-        markers=True
+        markers=True,
+        color_discrete_sequence=["#91BDB8"]
     )
     fig.update_layout(height=350)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 감정 점수 vs 별점 
 def show_emotion_rating(df):
@@ -157,14 +201,22 @@ def show_emotion_rating(df):
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=df_sorted['date'], y=df_sorted['rating'],
-        name='내 별점', mode='lines+markers'
+        name='내 별점', mode='lines+markers',
+        line=dict(color="#E9A6B2", width=3),
+        marker=dict(color="#E9A6B2")
     ))
     fig.add_trace(go.Scatter(
         x=df_sorted['date'], y=df_sorted['emotion_score'],
-        name='AI 감정점수', mode='lines+markers'
+        name='AI 감정점수', mode='lines+markers',
+         line=dict(color="#9A96B5", width=3),
+        marker=dict(color="#9A96B5")
     ))
     fig.update_layout(height=350, yaxis_range=[0, 5])
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 요일별 감상 패턴
 def show_weekday_pattern(df):
@@ -183,7 +235,8 @@ def show_weekday_pattern(df):
     fig = px.bar(
         weekday_counts, 
         x="weekday", 
-        y="count"
+        y="count",
+        color_discrete_sequence=["#B8AAD6"]
     )
     fig.update_layout(height=300)
     return fig # 두 그래프 나란히 배치 위해 그래프 객체만 반환
@@ -208,7 +261,8 @@ def show_time_pattern(df):
     fig = px.bar(
         period_counts, 
         x="time_period", 
-        y="count"
+        y="count",
+        color_discrete_sequence=["#91BDB8"]
     )
     fig.update_layout(height=300)
     return fig # 두 그래프 나란히 배치 위해 그래프 객체만 반환
@@ -244,10 +298,18 @@ def show_weekday_time_heatmap(df):
         x=period_order,
         y=weekday_order,
         text_auto=True,
-        color_continuous_scale='Reds'
+        color_continuous_scale= [
+        [0, "#F6F6F6"],
+        [0.5, "#F1DDE2"],
+        [1, "#E9A6B2"]
+    ]
     )
     fig.update_layout(height=400)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 워드클라우드
 def show_wordcloud(df):
@@ -308,7 +370,7 @@ def show_top3_favorites(df):
             st.markdown(f"<h2 style='text-align: center;'>{medals[i]}</h2>", unsafe_allow_html=True)
             st.markdown(f"<h4 style='text-align: center;'>{row['title']}</h4>", unsafe_allow_html=True)
             st.markdown(f"<p style='text-align: center;'>{row['category']} · {'⭐' * int(row['rating'])}</p>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center; color: #888;'>{row['summary']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center; color: #8785A2;'>{row['summary']}</p>", unsafe_allow_html=True)
 
 # 카테고리 간 만족 포인트 비교
 
@@ -337,17 +399,22 @@ def show_category_radar(df):
         return
 
     fig = go.Figure()
-    for cat in selected:
+    for i, cat in enumerate(selected):
         cat_data = cross[cross['category'] == cat]
         fig.add_trace(go.Scatterpolar(
             r=cat_data['count'],
             theta=cat_data['highlight_type'],
             fill='toself',
-            name=cat
+            name=cat,
+            line=dict(color=COLOR_PALETTE[i % len(COLOR_PALETTE)])
         ))
 
     fig.update_layout(height=400, showlegend=True)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 # 상관관계
 # 후기 글자수 - 별점
@@ -366,10 +433,15 @@ def show_length_rating(df):
         y='rating',
         labels={'review_length': '후기 글자수',
                 'rating': '별점'},
-        hover_data=['title'] #마우스 올리면 제목도 보이게
+        hover_data=['title'], #마우스 올리면 제목도 보이게,-
+        color_discrete_sequence=["#E3B184"]
     )
     fig.update_layout(height=350, yaxis_range=[0,5.5])
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
 def show_time_satisfaction(df):
     st.subheader("시간대별 평균 만족도")
@@ -387,6 +459,10 @@ def show_time_satisfaction(df):
 
     time_avg = df.groupby('time_period')['rating'].mean().reindex(period_order).reset_index()
 
-    fig = px.bar(time_avg, x="time_period", y="rating", text_auto=".1f")
+    fig = px.bar(time_avg, x="time_period", y="rating", text_auto=".1f", color_discrete_sequence=["#A9C7B0"])
     fig.update_layout(height=350, yaxis_range=[0, 5])
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
